@@ -1,9 +1,11 @@
-name: Build and Publish to GitHub Container Registry
+name: Build and Publish to GHCR
 
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0
 
 jobs:
   build-and-push:
@@ -26,13 +28,26 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build Docker image
-      id: build
+    - name: Determine image tag
+      id: vars
       run: |
-        docker build -t ghcr.io/quantumlyconfused/qcadmin-discord-bot:latest .
+        # Default to "latest" if not a tag push
+        TAG="latest"
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          TAG="${GITHUB_REF#refs/tags/}"
+        fi
+        echo "tag=$TAG" >> $GITHUB_ENV
 
-    # Only push the image if the build step is successful
+    - name: Build Docker image
+      run: |
+        docker build -t ghcr.io/quantumlyconfused/qcadmin-discord-bot:${{ env.tag }} .
+
     - name: Push Docker image
       if: ${{ success() }}
       run: |
-        docker push ghcr.io/quantumlyconfused/qcadmin-discord-bot:latest
+        docker push ghcr.io/quantumlyconfused/qcadmin-discord-bot:${{ env.tag }}
+        # Push the "latest" tag for main branch only
+        if [ "${{ env.tag }}" != "latest" ]; then
+          docker tag ghcr.io/quantumlyconfused/qcadmin-discord-bot:${{ env.tag }} ghcr.io/quantumlyconfused/qcadmin-discord-bot:latest
+          docker push ghcr.io/quantumlyconfused/qcadmin-discord-bot:latest
+        fi
