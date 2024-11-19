@@ -156,6 +156,37 @@ class QCAdmin(commands.Cog):
         except Exception as e:
             print(e)
             self.logger.error(f"Error syncing commands: {e}")
+    @admin.command(name="logs", description="Fetches the last N lines from the log file and sends them in a code block.")        
+    async def get_logs(self, ctx, num_lines: int):
+        """Fetches the last N lines from the log file and sends them in a code block."""
+        print(f"{ctx.author} requested the last {num_lines} lines from the log file.")
+        self.logger.info(f"{ctx.author} requested the last {num_lines} lines from the log file.")
+        log_file_path = "quantumly_confused_bot.log"  
+        try:
+            # Read the log file and get the last N lines
+            with open(log_file_path, "r", encoding="utf-8") as log_file:
+                lines = log_file.readlines()
+            # Get the last N lines
+            if num_lines <= 0:
+                await ctx.send("Please enter a valid positive integer.")
+                return
+
+            selected_lines = lines[-num_lines:]
+
+            # Create the message content and account for code block limitations
+            log_content = "".join(selected_lines)
+            if len(log_content) > 1900:  # Discord message limit for code blocks
+                log_content = log_content[-1900:]  # Trim to the last 1900 characters
+
+            # Send the logs in a code block
+            await ctx.send(f"```{log_content}```")
+            self.logger.info(f"Sent the last {num_lines} lines from the log file to {ctx.author}.")
+        except FileNotFoundError:
+            await ctx.send("The log file was not found. Please check the log file path.")
+            self.logger.error("Log file not found.")
+        except Exception as e:
+            await ctx.send(f"An error occurred while fetching the logs: {e}")
+            self.logger.error(f"Error fetching logs: {e}")
 
 # Bot initialization and startup
 async def main():
