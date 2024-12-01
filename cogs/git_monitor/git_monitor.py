@@ -69,7 +69,7 @@ class GitMonitor(commands.Cog):
 
     # Background commit checking loop which interacts with the GitHub API. 
     # The loop runs the check_guild_repos coroutine every 10 minutes, which in turn calls the check_repo_commits coroutine.
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=30)
     async def commit_check_loop(self):
         print("Commit check task started.") #! Debug print
         self.logger.debug("Commit check task started.")
