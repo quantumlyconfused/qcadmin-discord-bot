@@ -156,6 +156,7 @@ class QCAdmin(commands.Cog):
         except Exception as e:
             print(e)
             self.logger.error(f"Error syncing commands: {e}")
+            
     @admin.command(name="logs", description="Fetches the last N lines from the log file and sends them in a code block.")        
     async def get_logs(self, ctx, num_lines: int):
         """Fetches the last N lines from the log file and sends them in a code block."""
@@ -187,6 +188,19 @@ class QCAdmin(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred while fetching the logs: {e}")
             self.logger.error(f"Error fetching logs: {e}")
+    
+    # This will affect the log level for any other cogs that use the logger        
+    @admin.command(name="toggleloglevel", description="Toggles the log level between INFO and DEBUG.")
+    @is_mod_or_admin()
+    async def toggle_log_level(self, ctx):
+        """Toggles the log level between INFO and DEBUG."""
+        if self.logger.level == logging.INFO:
+            self.logger.setLevel(logging.DEBUG)
+            await ctx.send("Log level set to DEBUG.")
+        else:
+            self.logger.setLevel(logging.INFO)
+            await ctx.send("Log level set to INFO.")
+        self.logger.info(f"Log level changed to {self.logger.level}")
 
 # Bot initialization and startup
 async def main():

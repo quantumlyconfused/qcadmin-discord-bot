@@ -27,15 +27,17 @@ These variables should be provided in the Docker run or other environment where 
 
 ## Table of Contents
 
-1. [Bot Setup (`main.py`)](#bot-setup-mainpy)
-2. [Cog Modules](#cog-modules)
-   - [Grafana Integration (`grafana_discord_integration.py`)](#grafana-integration-grafana_discord_integrationpy)
-   - [Quantum Pterodactyl Integration (`quantum_pterodactyl.py`)](#quantum-pterodactyl-integration-quantum_pterodactylpy)
-   - [Status Updater (`qc_status.py`)](#status-updater-qc_statuspy)
-   - [Minecraft RCON Commands (`qc_rcon_commands.py`)](#minecraft-rcon-commands-qc_rcon_commandspy)
-3. [Dependencies (`requirements.txt`)](#dependencies-requirementstxt)
-4. [Environment Configuration](#environment-configuration)
-5. [Recommendations](#recommendations)
+- [QCAdmin Discord Bot Documentation](#qcadmin-discord-bot-documentation)
+    - [Environment Configuration](#environment-configuration)
+  - [Table of Contents](#table-of-contents)
+    - [Bot Setup (`main.py`)](#bot-setup-mainpy)
+    - [Cog Modules](#cog-modules)
+      - [Grafana Integration (`grafana_discord_integration.py`)](#grafana-integration-grafana_discord_integrationpy)
+      - [Quantum Pterodactyl Integration (`ptero.py`)](#quantum-pterodactyl-integration-pteropy)
+      - [Git Monitor (`git_monitor.py`)](#git-monitor-git_monitorpy)
+      - [Status Updater (`qc_status.py`)](#status-updater-qc_statuspy)
+      - [Minecraft RCON Commands (`qc_rcon_commands.py`)](#minecraft-rcon-commands-qc_rcon_commandspy)
+    - [Dependencies (`requirements.txt`)](#dependencies-requirementstxt)
 
 ---
 
@@ -70,15 +72,36 @@ The Grafana Integration cog provides commands to interact with a Grafana instanc
   - **Autocomplete Support**: Autocomplete functionality for panel and dashboard names.
   - **Interactive Panel Options**: Button-based time range options for dynamic data display.
 
-#### Quantum Pterodactyl Integration (`quantum_pterodactyl.py`)
+#### Quantum Pterodactyl Integration (`ptero.py`)
 
 The Quantum Pterodactyl cog integrates with the Pterodactyl API to manage game server power states.
 
 - **Commands**:
-  - **`/power start`**, **`/power stop`**, **`/power restart`**, **`/power kill`**: Manage server power states.
-  - **`/commands`**: Lists all available Quantum Pterodactyl commands.
+  - **`/pt_list`**: List all Pterodactyl game servers
+  - **`/pt_power state <serverid:str>`**: Get the current state of the game server
+  - **`/pt_power start <serverid:str>`**: Starts the game server
+  - **`/pt_power stop <serverid:str>`**: Stops the game server gracefully
+  - **`/pt_power restart <serverid:str>`**: Restarts the game server
+  - **`/pt_power kill <serverid:str>`**: Forcefully stops the game server
+  - **`/pt_commands`**: Lists all available QuantumPterodactyl commands
+ 
+#### Git Monitor (`git_monitor.py`)
 
-- **Error Handling**: Provides feedback for each command's success or failure, logging detailed information about errors.
+GitMonitor is a cog designed for QCAdmin that interacts with the GitHub API to notify a Discord channel whenever new commits are pushed to one or more monitored repositories.
+
+- **Setup**:
+  - Environment variables for GITMONITOR_TOKEN need to be set in order to communicate with the GitHub API.
+
+- **Commands**:
+
+  - **`/gitmonitor addrepo {user}/{repo}`**:	Add a repository to the watchlist.
+  - **`/gitmonitor removerepo {user}/{repo}`**:	Remove a repository from the watchlist.
+  - **`/gitmonitor setchannel {channel}`**:	Set the notification channel for commit updates.
+  - **`/gitmonitor channel`**:	View the currently configured notification channel.
+  - **`/gitmonitor repos`**:	View the list of repositories being monitored.
+  - **`/gitmonitor checkrepos`**:	Manually check for commits in the watchlist.
+  - **`/gitmonitor setinterval {minutes}`**:	Set the interval for automated commit checks.
+  - **`/gitmonitor help`**:	Display a help message with the list of available commands.
 
 #### Status Updater (`qc_status.py`)
 
